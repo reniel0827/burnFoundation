@@ -35,6 +35,33 @@ assets/images/        logo, event poster, program photography
 - **The contact form is front-end only.** It validates and resets but does not
   send; wire it to an email service (Formspree, Netlify Forms, etc.) before launch.
 
+## Security
+
+Applied in the page itself:
+
+- **Subresource Integrity** on both GSAP CDN scripts. Hashes are pinned to
+  3.12.5 — **recompute them if you bump the version** or the scripts will be
+  blocked.
+- **Content-Security-Policy** meta tag restricting script/style/font/img
+  origins. `'unsafe-inline'` is granted to `style-src` only, because GSAP
+  animates by writing to `element.style`.
+- `referrer` policy and `rel="noopener noreferrer"` on outbound links.
+
+Still required **at the host** (a `<meta>` CSP cannot set these):
+
+```
+X-Frame-Options: DENY                 # or CSP frame-ancestors 'none'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+```
+
+Also before launch:
+
+- Do **not** upload the `.git/` directory to the web root — it exposes full
+  source history. Deploy the tracked files only.
+- The contact form is client-side only. When wiring it to a backend, validate
+  and escape server-side (never trust the browser), and add spam protection.
+
 ## Credits
 
 GSAP + ScrollTrigger via CDN. Fonts: Bebas Neue, Oswald, Inter.
